@@ -2,7 +2,7 @@ Folder Contents:
 |   app.yaml - Required for GCP deployment
 |   data.csv - The data source which is explored using this API
 |   main.py - Flask API endpoint script
-|   README.md -  Contains information about other files and folders in this directory
+|   README -  Contains information about other files and folders in this repository
 |   requirements.txt - List of all necessary packages for the solution to work
 |   Stats.py - Python class which acts as an interface between Flask API endpoint and the data
 |
@@ -25,7 +25,7 @@ General Information:
 		PASSWORD:Qn94vt--aeNHKK7
 	3. The argument "filename" is optional for all the endpoints. This is provided to allow similar data exploration on the files uploaded using the endpoint /upload. If the new file needs to be explored, provide the name of the uploaded file as value for "filename" argument.
 	4. Swagger UI has dummy data in the preview and will result in unfavourable response. Find below the sample request data for each endpoint to test the API.
-	5. Feel free to test the API with different values but it is necessary to use the exact keynames for the dictionaries/objects to avoid STATUS_CODE 204 or 500.
+	5. Feel free to test the API with different values but it is necessary to use the exact keynames for the dictionaries or objects to avoid STATUS_CODE 204 or 500.
 
 
 Sample Request Data:	
