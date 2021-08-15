@@ -1,0 +1,501 @@
+---
+openapi: 3.0.0
+info:
+  title: Technical Challenge - Data Engineer - McMakler
+  description: API documentation for Technical challenge
+  contact:
+    email: sivasundarkarthikeyan12@gmail.com
+  version: 1.0.0
+servers:
+- url: /
+  description: Technical Challenge - Swagger UI
+- url: https://virtserver.swaggerhub.com/sivasundarkarthikeyan/Almost_Completed/1.0.0
+  description: SwaggerHub API Auto Mocking
+security:
+- basicAuth: []
+tags:
+- name: get
+  description: Retrieves data without using any filters on the columns
+- name: upload
+  description: Uploads new file to the workspace
+- name: filter
+  description: Retrieves data with filters applied on the columns
+paths:
+  /get/stats:
+    post:
+      tags:
+      - get
+      summary: Endpoint to provide stats data
+      operationId: get_stats
+      requestBody:
+        description: • *filename* - takes new file name as input, uses **data.csv** by default (OPTIONAL) <br/> • *column* - takes a column name that is available in the data source <br /> • *method* - takes **values** to return number of uniques values and **common** to return the most frequent item(s) in *column*
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetData'
+      responses:
+        "200":
+          description: Returns count of unique values or the most frequest item(s) in the given column based on the *method*
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Stats200'
+        "204":
+          description: Returns null if there are no results
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/None'
+        "400":
+          description: Error in request parameters
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/None'
+        "401":
+          description: Authentication Failure
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/None'
+  /get/top-n:
+    post:
+      tags:
+      - get
+      summary: Endpoint to fetch top N data after sorting as requested
+      operationId: get_top_n
+      requestBody:
+        description: • *filename* - takes new file name as input, uses **data.csv** by default (OPTIONAL) <br/> • *columns* - takes an array of column names in the order of sorting <br/> • *order* - takes an array of boolean values for deciding the sorting type, uses **ascending** by default <br/> • *limit* - total number of records to return from the sorted result
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetTopN'
+        required: true
+      responses:
+        "200":
+          description: Returns an object of array with data *Id* (MAX LEN - *limit*) in the request order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListInt200'
+        "204":
+          description: Returns null if there are no results
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/None'
+        "400":
+          description: Error in request parameters
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/None'
+        "401":
+          description: Authentication Failure
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/None'
+  /upload:
+    post:
+      tags:
+      - upload
+      summary: Endpoint to upload new dataset for further exploration
+      operationId: upload_data
+      requestBody:
+        description: Upload the CSV file
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/upload_body'
+      responses:
+        "200":
+          description: Returns **File saved** if the file storage succeeds
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+        "204":
+          description: Returns null if the file storage fails
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/None'
+        "400":
+          description: Error in request parameters
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/None'
+        "401":
+          description: Authentication Failure
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/None'
+  /filter/data:
+    post:
+      tags:
+      - filter
+      summary: Endpoint to filter data and return matched ids of records
+      operationId: filter_data
+      requestBody:
+        description: • *filename* - takes new file name as input, uses **data.csv** by default (OPTIONAL) <br/> • *column* - array of columns which needs to be filtered on<br/> • *operator* - array of appropriate operators to filter the column values <br/> • *value* -  array of values to use in the filter
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/FilterMatchesData'
+        required: true
+      responses:
+        "200":
+          description: Returns an array of *Id* of the records that matched all the given filters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListInt200'
+        "204":
+          description: Returns null if there are no matches
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/None'
+        "400":
+          description: Error in request parameters
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/None'
+        "401":
+          description: Authentication Failure
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/None'
+  /filter/matches:
+    post:
+      tags:
+      - filter
+      summary: Endpoint to filter data and return total matched records
+      operationId: filter_matches
+      requestBody:
+        description: • *filename* - takes new file name as input, uses **data.csv** by default (OPTIONAL) <br/> • *column* - array of columns which needs to be filtered on<br/> • *operator* - array of appropriate operators to filter the column values <br/> • *value* -  array of values to use in the filter
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/FilterMatchesData'
+        required: true
+      responses:
+        "200":
+          description: Returns the total number of records that matched all the given filters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Integer200'
+        "204":
+          description: Returns null if there are no matches
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/None'
+        "400":
+          description: Error in request parameters
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/None'
+        "401":
+          description: Authentication Failure
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/None'
+  /filter/matches-data:
+    post:
+      tags:
+      - filter
+      summary: Endpoint to filter data, return total matched records and array of ids of the matched records
+      operationId: filter_matches_data
+      requestBody:
+        description: • *filename* - takes new file name as input, uses **data.csv** by default (OPTIONAL) <br/> • *column* - array of columns which needs to be filtered on<br/> • *operator* - array of appropriate operators to filter the column values <br/> • *value* -  array of values to use in the filter
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/FilterMatchesData'
+        required: true
+      responses:
+        "200":
+          description: Returns the total number and array of ids of records that matched all the given filters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Data200'
+        "204":
+          description: Returns null if there are no matches
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/None'
+        "400":
+          description: Error in request parameters
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/None'
+        "401":
+          description: Authentication Failure
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/None'
+  /filter/by-name:
+    post:
+      tags:
+      - filter
+      summary: Endpoint to find partial string match on string datatype columns
+      operationId: filter_by_name
+      requestBody:
+        description: • *filename* - takes new file name as input, uses **data.csv** by default (OPTIONAL) <br/> • *column* - takes an array of column names that has string data <br/> • *value* - takes an array of string values to perform partial substring match
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/FilterByName'
+        required: true
+      responses:
+        "200":
+          description: Returns total number of matched records that matches all the given substring filters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListString200'
+        "204":
+          description: Returns null if there are no matches
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/None'
+        "400":
+          description: Error in request parameters
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/None'
+        "401":
+          description: Authentication Failure
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/None'
+  /filter/by-id:
+    post:
+      tags:
+      - filter
+      summary: Endpoint to provide complete data for all the matched ids
+      operationId: filter_by_id
+      requestBody:
+        description: • *filename* - takes new file name as input, uses **data.csv** by default (OPTIONAL) <br/> • *ids* - takes an array of *Id*, (Id >= 0)
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/FilterById'
+        required: true
+      responses:
+        "200":
+          description: Returns data from all columns for the records that matches the given *Id*
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Data200'
+        "204":
+          description: Returns null if there are no matches
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/None'
+        "400":
+          description: Error in request parameters
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/None'
+        "401":
+          description: Authentication Failure
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/None'
+components:
+  schemas:
+    Data200:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/Data'
+    Integer200:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/Integer'
+    ListString200:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ListString'
+    ListInt200:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ListInt'
+    Stats200:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/Stats'
+    Stats:
+      oneOf:
+      - $ref: '#/components/schemas/Integer'
+      - $ref: '#/components/schemas/ListString'
+    String:
+      type: string
+      nullable: false
+      example: MSZoning
+    Data:
+      type: object
+    ListInt:
+      type: number
+      nullable: true
+    ListBoolean:
+      type: boolean
+      example: false
+    ListString:
+      type: string
+      example: '["Pave","IR2","AllPub"]'
+    ListStringorInt:
+      oneOf:
+      - $ref: '#/components/schemas/ListString'
+      - $ref: '#/components/schemas/ListInt'
+    None:
+      type: string
+      nullable: true
+      example: "null"
+    Integer:
+      type: number
+      format: integer
+      example: 6
+    GetData:
+      required:
+      - column
+      - method
+      type: object
+      properties:
+        filename:
+          $ref: '#/components/schemas/String'
+        column:
+          $ref: '#/components/schemas/String'
+        method:
+          $ref: '#/components/schemas/String'
+    GetTopN:
+      required:
+      - filters
+      type: object
+      properties:
+        filters:
+          $ref: '#/components/schemas/GetTopN_filters'
+    FilterByName:
+      required:
+      - filters
+      type: object
+      properties:
+        filters:
+          $ref: '#/components/schemas/FilterByName_filters'
+    FilterMatchesData:
+      required:
+      - filters
+      type: object
+      properties:
+        filters:
+          $ref: '#/components/schemas/FilterMatchesData_filters'
+    FilterById:
+      required:
+      - ids
+      type: object
+      properties:
+        filename:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - example: data.csv
+        ids:
+          $ref: '#/components/schemas/ListInt'
+    upload_body:
+      type: object
+      properties:
+        data:
+          type: string
+          format: binary
+    inline_response_200:
+      type: object
+      properties:
+        result:
+          type: string
+          example: File saved
+    GetTopN_filters:
+      required:
+      - column
+      - limit
+      - method
+      type: object
+      properties:
+        filename:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - example: data.csv
+        column:
+          $ref: '#/components/schemas/ListString'
+        order:
+          $ref: '#/components/schemas/ListBoolean'
+        limit:
+          $ref: '#/components/schemas/Integer'
+    FilterByName_filters:
+      required:
+      - column
+      - value
+      type: object
+      properties:
+        filename:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - example: data.csv
+        column:
+          $ref: '#/components/schemas/ListString'
+        value:
+          $ref: '#/components/schemas/ListString'
+    FilterMatchesData_filters:
+      required:
+      - column
+      - operator
+      - value
+      type: object
+      properties:
+        filename:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - example: data.csv
+        operator:
+          $ref: '#/components/schemas/ListString'
+        column:
+          $ref: '#/components/schemas/ListString'
+        value:
+          $ref: '#/components/schemas/ListStringorInt'
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
